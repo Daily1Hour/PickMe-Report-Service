@@ -20,8 +20,7 @@ public class Report {
 
     @Data
     public static class CompanyIndustryReport {
-        private String companyName;
-        private String industryType;
+        private String category;
         private Date createdAt;
         private Date updatedAt;
         private List<CompanyDetail> companyDetails;
@@ -30,6 +29,7 @@ public class Report {
 
     @Data
     public static class CompanyDetail {
+        private String companyName;
         private String companyFeatures;
         private String companyIdealTalent;
         private String companyNews;
@@ -37,6 +37,7 @@ public class Report {
 
     @Data
     public static class IndustryDetails {
+        private String industryType;
         private String industryFeatures;
         private String industryNews;
     }
