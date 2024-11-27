@@ -24,7 +24,7 @@ public class Report {
         private Date createdAt;
         private Date updatedAt;
         private List<CompanyDetail> companyDetails;
-        private List<IndustryDetails> industryDetails;
+        private List<IndustryDetail> industryDetails;
     }
 
     @Data
@@ -36,7 +36,7 @@ public class Report {
     }
 
     @Data
-    public static class IndustryDetails {
+    public static class IndustryDetail {
         private String industryType;
         private String industryFeatures;
         private String industryNews;
