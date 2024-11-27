@@ -10,7 +10,7 @@ import java.util.List;
 
 @Document(collection = "reports")
 @Data
-@Schema(description = "기업 분석 데이터 모델")
+@Schema(description = "기업 및 산업 분석 데이터 모델")
 public class Report {
 
     @Id
