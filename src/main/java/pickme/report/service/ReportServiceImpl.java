@@ -33,6 +33,7 @@ public class ReportServiceImpl implements ReportService {
 
         // 새로운 CompanyIndustryReport 생성
         Report.CompanyIndustryReport companyIndustryReport = new Report.CompanyIndustryReport();
+        companyIndustryReport.setReportId(UUID.randomUUID().toString());
         companyIndustryReport.setCategory(category);
         Date now = new Date();
         companyIndustryReport.setCreatedAt(now);

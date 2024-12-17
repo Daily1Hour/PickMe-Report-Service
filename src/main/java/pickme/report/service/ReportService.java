@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ReportService {
 
-    CompanyIndustryReportResponseDTO createReport(String userId, CompanyIndustryReportCreateDTO reportCreateDTO);
+    String createReport(String userId, CompanyIndustryReportCreateDTO reportCreateDTO);
 
     CompanyIndustryReportResponseDTO getReport(String userId, String reportId, int page, int size);
 
