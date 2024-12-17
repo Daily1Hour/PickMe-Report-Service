@@ -58,7 +58,7 @@ jobs:
           sleep 10 # 서버가 시작될 시간을 기다림
 
       - name: Generate OpenAPI Spec (YAML)
-        run: curl -o openapi.yaml http://localhost:8080/v3/api-docs.yaml # OpenAPI 명세서를 저장
+        run: curl -o openapi.yaml http://localhost:8080/swagger-ui/index.html # OpenAPI 명세서를 저장
 
       - name: Validate OpenAPI specification
         run: |
