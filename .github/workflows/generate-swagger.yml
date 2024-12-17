@@ -1,6 +1,7 @@
 name: Generate Swagger
 
 on:
+  workflow_dispatch: # 수동 실행
   push:
     tags: # 태그가 푸시될 때만 실행
       - "v*.*.*"
@@ -38,7 +39,7 @@ jobs:
       - name: Find the JAR file
         id: find-jar
         run: |
-          JAR_FILE=$(find -name "*.jar" -print -quit) # jar 파일을 찾아서 환경 변수에 저장
+          JAR_FILE=$(find . -maxdepth 1 -name "*.jar" -print -quit) # jar 파일을 찾아서 환경 변수에 저장
           echo "JAR_FILE=$JAR_FILE" >> $GITHUB_ENV # 환경 변수에 저장
 
       - name: Set up JDK 17
