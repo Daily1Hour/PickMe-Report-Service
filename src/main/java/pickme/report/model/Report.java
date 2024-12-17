@@ -20,6 +20,7 @@ public class Report {
 
     @Data
     public static class CompanyIndustryReport {
+        private String reportId;
         private String category;
         private Date createdAt;
         private Date updatedAt;
