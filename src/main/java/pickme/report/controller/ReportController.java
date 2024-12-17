@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/reports")
+@RequestMapping
 @Tag(name = "Report", description = "기업 및 산업 분석 관리 API")
 public class ReportController {
 
@@ -28,7 +28,7 @@ public class ReportController {
 
     // 1. 새로운 CompanyIndustryReport 생성
     @Operation(summary = "보고서 생성", description = "새로운 기업/산업 보고서를 생성합니다.")
-    @PostMapping
+    @PostMapping("/report")
     public ResponseEntity<CompanyIndustryReportResponseDTO> createReport(
             @RequestHeader(value = "Authorization") String token,
             @Valid @RequestBody CompanyIndustryReportCreateDTO reportCreateDTO
@@ -40,7 +40,7 @@ public class ReportController {
 
     // 2. 특정 CompanyIndustryReport 조회
     @Operation(summary = "보고서 조회", description = "특정 보고서를 조회합니다.")
-    @GetMapping
+    @GetMapping("/report")
     public ResponseEntity<CompanyIndustryReportResponseDTO> getReport(
             @RequestHeader(value = "Authorization") String token,
             @RequestParam String category,
@@ -59,7 +59,7 @@ public class ReportController {
 
     // 3. CompanyIndustryReport 업데이트
     @Operation(summary = "보고서 업데이트", description = "보고서를 업데이트합니다.")
-    @PutMapping
+    @PutMapping("/report")
     public ResponseEntity<CompanyIndustryReportResponseDTO> updateReport(
             @RequestHeader(value = "Authorization") String token,
             @RequestParam String category,
@@ -77,7 +77,7 @@ public class ReportController {
 
     // 4. CompanyIndustryReport 삭제
     @Operation(summary = "보고서 삭제", description = "보고서를 삭제합니다.")
-    @DeleteMapping
+    @DeleteMapping("/report")
     public ResponseEntity<Void> deleteReport(
             @RequestHeader(value = "Authorization") String token,
             @RequestParam String category,
@@ -94,7 +94,7 @@ public class ReportController {
 
     // 5. 보고서 리스트 조회 (페이징 적용)
     @Operation(summary = "보고서 리스트 조회", description = "보고서 리스트를 조회합니다.")
-    @GetMapping("/list")
+    @GetMapping("/reports")
     public ResponseEntity<List<CompanyIndustryReportResponseDTO>> getReportList(
             @RequestHeader(value = "Authorization") String token,
             @RequestParam String category,
