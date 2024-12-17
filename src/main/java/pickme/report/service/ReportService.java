@@ -10,11 +10,11 @@ public interface ReportService {
 
     CompanyIndustryReportResponseDTO createReport(String userId, CompanyIndustryReportCreateDTO reportCreateDTO);
 
-    CompanyIndustryReportResponseDTO getReport(String userId, String category, Date createdAt, int page, int size);
+    CompanyIndustryReportResponseDTO getReport(String userId, String reportId, int page, int size);
 
-    CompanyIndustryReportResponseDTO updateReport(String userId, String category, Date createdAt, CompanyIndustryReportCreateDTO reportUpdateDTO);
+    CompanyIndustryReportResponseDTO updateReport(String userId, String reportId, CompanyIndustryReportCreateDTO reportUpdateDTO);
 
-    boolean deleteReport(String userId, String category, Date createdAt);
+    boolean deleteReport(String userId, String reportId);
 
     List<CompanyIndustryReportResponseDTO> getReportList(String userId, String category, int page, int size);
 
