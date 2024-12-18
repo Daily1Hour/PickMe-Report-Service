@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pickme.report.dto.CompanyIndustryReportCreateDTO;
 import pickme.report.dto.CompanyIndustryReportResponseDTO;
+import pickme.report.dto.CompanyIndustryReportSidebarDTO;
 import pickme.report.mapper.ReportMapper;
 import pickme.report.model.Report;
 import pickme.report.repository.ReportRepository;
@@ -124,17 +125,18 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<CompanyIndustryReportResponseDTO> getReportList(String userId, String category, int page, int size) {
+    public List<CompanyIndustryReportSidebarDTO> getSidebarData(String userId) {
         Optional<Report> optionalReport = reportRepository.findById(userId);
         if (optionalReport.isPresent()) {
-            List<Report.CompanyIndustryReport> reports = optionalReport.get().getReports().stream()
-                    .filter(r -> r.getCategory().equalsIgnoreCase(category))
-                    .collect(Collectors.toList());
-
-            List<Report.CompanyIndustryReport> paginatedReports = paginateList(reports, page, size);
-
-            return paginatedReports.stream()
-                    .map(reportMapper::toCompanyIndustryReportResponseDTO)
+            return optionalReport.get().getReports().stream()
+                    .map(r -> {
+                        CompanyIndustryReportSidebarDTO dto = new CompanyIndustryReportSidebarDTO();
+                        dto.setReportId(r.getReportId());
+                        dto.setCategory(r.getCategory());
+                        dto.setCreatedAt(r.getCreatedAt());
+                        dto.setUpdatedAt(r.getUpdatedAt());
+                        return dto;
+                    })
                     .collect(Collectors.toList());
         }
         return Collections.emptyList();

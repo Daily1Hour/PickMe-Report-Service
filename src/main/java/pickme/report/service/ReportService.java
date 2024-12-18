@@ -2,6 +2,7 @@ package pickme.report.service;
 
 import pickme.report.dto.CompanyIndustryReportCreateDTO;
 import pickme.report.dto.CompanyIndustryReportResponseDTO;
+import pickme.report.dto.CompanyIndustryReportSidebarDTO;
 
 import java.util.Date;
 import java.util.List;
@@ -16,6 +17,6 @@ public interface ReportService {
 
     boolean deleteReport(String userId, String reportId);
 
-    List<CompanyIndustryReportResponseDTO> getReportList(String userId, String category, int page, int size);
+    List<CompanyIndustryReportSidebarDTO> getSidebarData(String userId);
 
 }
