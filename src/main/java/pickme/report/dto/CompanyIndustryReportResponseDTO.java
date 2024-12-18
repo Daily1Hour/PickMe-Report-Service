@@ -13,7 +13,7 @@ public class CompanyIndustryReportResponseDTO {
     private String category;
     private Date createdAt;
     private Date updatedAt;
-    private List<CompanyDetailDTO> companyDetails;
-    private List<IndustryDetailDTO> industryDetails;
+    private CompanyDetailDTO companyDetails;
+    private IndustryDetailDTO industryDetails;
 
 }
