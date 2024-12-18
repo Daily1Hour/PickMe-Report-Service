@@ -24,8 +24,8 @@ public class Report {
         private String category;
         private Date createdAt;
         private Date updatedAt;
-        private List<CompanyDetail> companyDetails;
-        private List<IndustryDetail> industryDetails;
+        private CompanyDetail companyDetails;
+        private IndustryDetail industryDetails;
     }
 
     @Data
