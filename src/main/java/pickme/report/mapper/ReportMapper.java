@@ -21,8 +21,8 @@ public interface ReportMapper {
         dto.setCategory(report.getCategory());
         dto.setCreatedAt(report.getCreatedAt());
         dto.setUpdatedAt(report.getUpdatedAt());
-        dto.setCompanyDetails(toCompanyDetailDTO(report.getCompanyDetail()));
-        dto.setIndustryDetails(toIndustryDetailDTO(report.getIndustryDetail()));
+        dto.setCompanyDetail(toCompanyDetailDTO(report.getCompanyDetail()));
+        dto.setIndustryDetail(toIndustryDetailDTO(report.getIndustryDetail()));
         return dto;
     }
 
