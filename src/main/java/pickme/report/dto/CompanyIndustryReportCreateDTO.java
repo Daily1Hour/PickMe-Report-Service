@@ -17,10 +17,10 @@ public class CompanyIndustryReportCreateDTO {
 
     @Schema(description = "회사 상세 정보 리스트")
     @Valid
-    private CompanyDetailDTO companyDetails;
+    private CompanyDetailDTO companyDetail;
 
     @Schema(description = "산업 상세 정보 리스트")
     @Valid
-    private IndustryDetailDTO industryDetails;
+    private IndustryDetailDTO industryDetail;
 
 }

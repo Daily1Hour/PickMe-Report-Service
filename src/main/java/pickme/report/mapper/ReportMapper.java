@@ -21,49 +21,9 @@ public interface ReportMapper {
         dto.setCategory(report.getCategory());
         dto.setCreatedAt(report.getCreatedAt());
         dto.setUpdatedAt(report.getUpdatedAt());
-        dto.setCompanyDetails(toCompanyDetailDTOList(report.getCompanyDetails()));
-        dto.setIndustryDetails(toIndustryDetailDTOList(report.getIndustryDetails()));
+        dto.setCompanyDetails(toCompanyDetailDTO(report.getCompanyDetail()));
+        dto.setIndustryDetails(toIndustryDetailDTO(report.getIndustryDetail()));
         return dto;
-    }
-
-    // CompanyDetail 리스트를 CompanyDetailDTO 리스트로 매핑
-    default List<CompanyDetailDTO> toCompanyDetailDTOList(List<Report.CompanyDetail> details) {
-        if (details == null) {
-            return null;
-        }
-        return details.stream()
-                .map(this::toCompanyDetailDTO)
-                .collect(Collectors.toList());
-    }
-
-    // CompanyDetailDTO 리스트를 CompanyDetail 리스트로 매핑
-    default List<Report.CompanyDetail> toCompanyDetailList(List<CompanyDetailDTO> details) {
-        if (details == null) {
-            return null;
-        }
-        return details.stream()
-                .map(this::toCompanyDetail)
-                .collect(Collectors.toList());
-    }
-
-    // IndustryDetail 리스트를 IndustryDetailDTO 리스트로 매핑
-    default List<IndustryDetailDTO> toIndustryDetailDTOList(List<Report.IndustryDetail> details) {
-        if (details == null) {
-            return null;
-        }
-        return details.stream()
-                .map(this::toIndustryDetailDTO)
-                .collect(Collectors.toList());
-    }
-
-    // IndustryDetailDTO 리스트를 IndustryDetail 리스트로 매핑
-    default List<Report.IndustryDetail> toIndustryDetailList(List<IndustryDetailDTO> details) {
-        if (details == null) {
-            return null;
-        }
-        return details.stream()
-                .map(this::toIndustryDetail)
-                .collect(Collectors.toList());
     }
 
     // 개별 매핑 메서드들
