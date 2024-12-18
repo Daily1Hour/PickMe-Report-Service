@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pickme.report.dto.CompanyIndustryReportCreateDTO;
 import pickme.report.dto.CompanyIndustryReportResponseDTO;
+import pickme.report.dto.ReportIdResponseDTO;
 import pickme.report.service.JWTService;
 import pickme.report.service.ReportService;
 
@@ -29,13 +30,15 @@ public class ReportController {
     // 1. 새로운 CompanyIndustryReport 생성
     @Operation(summary = "보고서 생성", description = "새로운 기업/산업 보고서를 생성합니다.")
     @PostMapping("/report")
-    public ResponseEntity<CompanyIndustryReportResponseDTO> createReport(
+    public ResponseEntity<ReportIdResponseDTO> createReport(
             @RequestHeader(value = "Authorization") String token,
             @Valid @RequestBody CompanyIndustryReportCreateDTO reportCreateDTO
     ) throws Exception {
         String userId = jwtService.extractToken(token);
-        CompanyIndustryReportResponseDTO responseDTO = reportService.createReport(userId, reportCreateDTO);
-        return ResponseEntity.status(201).body(responseDTO);
+        String reportId = reportService.createReport(userId, reportCreateDTO);
+        // reportId만 담은 DTO 반환
+        ReportIdResponseDTO response = new ReportIdResponseDTO(reportId);
+        return ResponseEntity.status(201).body(response);
     }
 
     // 2. 특정 CompanyIndustryReport 조회
@@ -43,13 +46,12 @@ public class ReportController {
     @GetMapping("/report")
     public ResponseEntity<CompanyIndustryReportResponseDTO> getReport(
             @RequestHeader(value = "Authorization") String token,
-            @RequestParam String category,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date createdAt,
+            @RequestParam String reportId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) throws Exception {
         String userId = jwtService.extractToken(token);
-        CompanyIndustryReportResponseDTO responseDTO = reportService.getReport(userId, category, createdAt, page, size);
+        CompanyIndustryReportResponseDTO responseDTO = reportService.getReport(userId, reportId, page, size);
         if (responseDTO != null) {
             return ResponseEntity.ok(responseDTO);
         } else {
@@ -62,12 +64,11 @@ public class ReportController {
     @PutMapping("/report")
     public ResponseEntity<CompanyIndustryReportResponseDTO> updateReport(
             @RequestHeader(value = "Authorization") String token,
-            @RequestParam String category,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date createdAt,
+            @RequestParam String reportId,
             @Valid @RequestBody CompanyIndustryReportCreateDTO reportUpdateDTO
     ) throws Exception {
         String userId = jwtService.extractToken(token);
-        CompanyIndustryReportResponseDTO responseDTO = reportService.updateReport(userId, category, createdAt, reportUpdateDTO);
+        CompanyIndustryReportResponseDTO responseDTO = reportService.updateReport(userId, reportId, reportUpdateDTO);
         if (responseDTO != null) {
             return ResponseEntity.ok(responseDTO);
         } else {
@@ -80,11 +81,10 @@ public class ReportController {
     @DeleteMapping("/report")
     public ResponseEntity<Void> deleteReport(
             @RequestHeader(value = "Authorization") String token,
-            @RequestParam String category,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date createdAt
+            @RequestParam String reportId
     ) throws Exception {
         String userId = jwtService.extractToken(token);
-        boolean deleted = reportService.deleteReport(userId, category, createdAt);
+        boolean deleted = reportService.deleteReport(userId, reportId);
         if (deleted) {
             return ResponseEntity.noContent().build();
         } else {

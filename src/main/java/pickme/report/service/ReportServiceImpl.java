@@ -21,7 +21,7 @@ public class ReportServiceImpl implements ReportService {
     private ReportMapper reportMapper;
 
     @Override
-    public CompanyIndustryReportResponseDTO createReport(String userId, CompanyIndustryReportCreateDTO reportCreateDTO) {
+    public String createReport(String userId, CompanyIndustryReportCreateDTO reportCreateDTO) {
         Report report = reportRepository.findById(userId).orElseGet(() -> {
             Report newReport = new Report();
             newReport.setUserId(userId);
@@ -33,7 +33,8 @@ public class ReportServiceImpl implements ReportService {
 
         // 새로운 CompanyIndustryReport 생성
         Report.CompanyIndustryReport companyIndustryReport = new Report.CompanyIndustryReport();
-        companyIndustryReport.setReportId(UUID.randomUUID().toString());
+        String reportId = UUID.randomUUID().toString();
+        companyIndustryReport.setReportId(reportId);
         companyIndustryReport.setCategory(category);
         Date now = new Date();
         companyIndustryReport.setCreatedAt(now);
@@ -54,21 +55,22 @@ public class ReportServiceImpl implements ReportService {
         // 저장
         reportRepository.save(report);
 
-        return reportMapper.toCompanyIndustryReportResponseDTO(companyIndustryReport);
+        return reportId;
     }
 
     @Override
-    public CompanyIndustryReportResponseDTO getReport(String userId, String category, Date createdAt, int page, int size) {
+    public CompanyIndustryReportResponseDTO getReport(String userId, String reportId, int page, int size) {
         Optional<Report> optionalReport = reportRepository.findById(userId);
         if (optionalReport.isPresent()) {
-            Report.CompanyIndustryReport report = findReport(optionalReport.get(), category, createdAt);
-            if (report != null) {
-                CompanyIndustryReportResponseDTO responseDTO = reportMapper.toCompanyIndustryReportResponseDTO(report);
+            Report.CompanyIndustryReport foundReport = findReportById(optionalReport.get(), reportId);
+            if (foundReport != null) {
+                CompanyIndustryReportResponseDTO responseDTO = reportMapper.toCompanyIndustryReportResponseDTO(foundReport);
+                String category = foundReport.getCategory();
                 // Details에 페이징 적용
-                if (category.equalsIgnoreCase("company") || category.equalsIgnoreCase("all")) {
+                if ((category.equalsIgnoreCase("company") || category.equalsIgnoreCase("all")) && responseDTO.getCompanyDetails() != null) {
                     responseDTO.setCompanyDetails(paginateList(responseDTO.getCompanyDetails(), page, size));
                 }
-                if (category.equalsIgnoreCase("industry") || category.equalsIgnoreCase("all")) {
+                if ((category.equalsIgnoreCase("industry") || category.equalsIgnoreCase("all")) && responseDTO.getCompanyDetails() != null) {
                     responseDTO.setIndustryDetails(paginateList(responseDTO.getIndustryDetails(), page, size));
                 }
                 return responseDTO;
@@ -78,19 +80,24 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public CompanyIndustryReportResponseDTO updateReport(String userId, String category, Date createdAt, CompanyIndustryReportCreateDTO reportUpdateDTO) {
+    public CompanyIndustryReportResponseDTO updateReport(String userId, String reportId, CompanyIndustryReportCreateDTO reportUpdateDTO) {
         Optional<Report> optionalReport = reportRepository.findById(userId);
         if (optionalReport.isPresent()) {
             Report report = optionalReport.get();
-            Report.CompanyIndustryReport companyIndustryReport = findReport(report, category, createdAt);
+            Report.CompanyIndustryReport companyIndustryReport = findReportById(report, reportId);
             if (companyIndustryReport != null) {
+                String category = companyIndustryReport.getCategory();
                 // Category에 따라 Details 업데이트
                 if (category.equalsIgnoreCase("company") || category.equalsIgnoreCase("all")) {
                     companyIndustryReport.setCompanyDetails(reportMapper.toCompanyDetailList(reportUpdateDTO.getCompanyDetails()));
+                } else {
+                    companyIndustryReport.setCompanyDetails(null);
                 }
 
                 if (category.equalsIgnoreCase("industry") || category.equalsIgnoreCase("all")) {
                     companyIndustryReport.setIndustryDetails(reportMapper.toIndustryDetailList(reportUpdateDTO.getIndustryDetails()));
+                } else {
+                    companyIndustryReport.setIndustryDetails(null);
                 }
 
                 companyIndustryReport.setUpdatedAt(new Date());
@@ -102,11 +109,11 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public boolean deleteReport(String userId, String category, Date createdAt) {
+    public boolean deleteReport(String userId, String reportId) {
         Optional<Report> optionalReport = reportRepository.findById(userId);
         if (optionalReport.isPresent()) {
             Report report = optionalReport.get();
-            Report.CompanyIndustryReport companyIndustryReport = findReport(report, category, createdAt);
+            Report.CompanyIndustryReport companyIndustryReport = findReportById(report, reportId);
             if (companyIndustryReport != null) {
                 report.getReports().remove(companyIndustryReport);
                 reportRepository.save(report);
@@ -134,9 +141,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     // 헬퍼 메서드
-    private Report.CompanyIndustryReport findReport(Report report, String category, Date createdAt) {
+    private Report.CompanyIndustryReport findReportById(Report report, String reportId) {
         return report.getReports().stream()
-                .filter(r -> r.getCategory().equalsIgnoreCase(category) && r.getCreatedAt().equals(createdAt))
+                .filter(r -> r.getReportId().equals(reportId))
                 .findFirst()
                 .orElse(null);
     }
