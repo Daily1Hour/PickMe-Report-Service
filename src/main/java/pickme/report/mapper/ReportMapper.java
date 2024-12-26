@@ -6,9 +6,6 @@ import pickme.report.dto.CompanyIndustryReportResponseDTO;
 import pickme.report.dto.IndustryDetailDTO;
 import pickme.report.model.Report;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Mapper(componentModel = "spring")
 public interface ReportMapper {
 

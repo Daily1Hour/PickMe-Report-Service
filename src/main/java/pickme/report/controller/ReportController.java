@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pickme.report.dto.CompanyIndustryReportCreateDTO;
@@ -14,7 +13,6 @@ import pickme.report.dto.ReportIdResponseDTO;
 import pickme.report.service.JWTService;
 import pickme.report.service.ReportService;
 
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -47,12 +45,10 @@ public class ReportController {
     @GetMapping
     public ResponseEntity<CompanyIndustryReportResponseDTO> getReport(
             @RequestHeader(value = "Authorization") String token,
-            @RequestParam String reportId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam String reportId
     ) throws Exception {
         String userId = jwtService.extractToken(token);
-        CompanyIndustryReportResponseDTO responseDTO = reportService.getReport(userId, reportId, page, size);
+        CompanyIndustryReportResponseDTO responseDTO = reportService.getReport(userId, reportId);
         if (responseDTO != null) {
             return ResponseEntity.ok(responseDTO);
         } else {

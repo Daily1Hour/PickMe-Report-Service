@@ -41,13 +41,13 @@ public class ReportServiceImpl implements ReportService {
         companyIndustryReport.setCreatedAt(now);
         companyIndustryReport.setUpdatedAt(now);
 
-        // Category에 따라 Details 설정
+        // Category에 따라 Detail 설정
         if (category.equalsIgnoreCase("company") || category.equalsIgnoreCase("all")) {
-            companyIndustryReport.setCompanyDetails(reportMapper.toCompanyDetailList(reportCreateDTO.getCompanyDetails()));
+            companyIndustryReport.setCompanyDetail(reportMapper.toCompanyDetail(reportCreateDTO.getCompanyDetail()));
         }
 
         if (category.equalsIgnoreCase("industry") || category.equalsIgnoreCase("all")) {
-            companyIndustryReport.setIndustryDetails(reportMapper.toIndustryDetailList(reportCreateDTO.getIndustryDetails()));
+            companyIndustryReport.setIndustryDetail(reportMapper.toIndustryDetail(reportCreateDTO.getIndustryDetail()));
         }
 
         // Report에 추가
@@ -60,21 +60,12 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public CompanyIndustryReportResponseDTO getReport(String userId, String reportId, int page, int size) {
+    public CompanyIndustryReportResponseDTO getReport(String userId, String reportId) {
         Optional<Report> optionalReport = reportRepository.findById(userId);
         if (optionalReport.isPresent()) {
             Report.CompanyIndustryReport foundReport = findReportById(optionalReport.get(), reportId);
             if (foundReport != null) {
-                CompanyIndustryReportResponseDTO responseDTO = reportMapper.toCompanyIndustryReportResponseDTO(foundReport);
-                String category = foundReport.getCategory();
-                // Details에 페이징 적용
-                if ((category.equalsIgnoreCase("company") || category.equalsIgnoreCase("all")) && responseDTO.getCompanyDetails() != null) {
-                    responseDTO.setCompanyDetails(paginateList(responseDTO.getCompanyDetails(), page, size));
-                }
-                if ((category.equalsIgnoreCase("industry") || category.equalsIgnoreCase("all")) && responseDTO.getCompanyDetails() != null) {
-                    responseDTO.setIndustryDetails(paginateList(responseDTO.getIndustryDetails(), page, size));
-                }
-                return responseDTO;
+                return reportMapper.toCompanyIndustryReportResponseDTO(foundReport);
             }
         }
         return null;
@@ -90,15 +81,15 @@ public class ReportServiceImpl implements ReportService {
                 String category = companyIndustryReport.getCategory();
                 // Category에 따라 Details 업데이트
                 if (category.equalsIgnoreCase("company") || category.equalsIgnoreCase("all")) {
-                    companyIndustryReport.setCompanyDetails(reportMapper.toCompanyDetailList(reportUpdateDTO.getCompanyDetails()));
+                    companyIndustryReport.setCompanyDetail(reportMapper.toCompanyDetail(reportUpdateDTO.getCompanyDetail()));
                 } else {
-                    companyIndustryReport.setCompanyDetails(null);
+                    companyIndustryReport.setCompanyDetail(null);
                 }
 
                 if (category.equalsIgnoreCase("industry") || category.equalsIgnoreCase("all")) {
-                    companyIndustryReport.setIndustryDetails(reportMapper.toIndustryDetailList(reportUpdateDTO.getIndustryDetails()));
+                    companyIndustryReport.setIndustryDetail(reportMapper.toIndustryDetail(reportUpdateDTO.getIndustryDetail()));
                 } else {
-                    companyIndustryReport.setIndustryDetails(null);
+                    companyIndustryReport.setIndustryDetail(null);
                 }
 
                 companyIndustryReport.setUpdatedAt(new Date());
@@ -148,15 +139,6 @@ public class ReportServiceImpl implements ReportService {
                 .filter(r -> r.getReportId().equals(reportId))
                 .findFirst()
                 .orElse(null);
-    }
-
-    private <T> List<T> paginateList(List<T> list, int page, int size) {
-        int start = page * size;
-        int end = Math.min(start + size, list.size());
-        if (start >= list.size()) {
-            return Collections.emptyList();
-        }
-        return list.subList(start, end);
     }
 
 }
