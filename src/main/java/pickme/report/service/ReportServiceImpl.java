@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pickme.report.dto.CompanyIndustryReportCreateDTO;
 import pickme.report.dto.CompanyIndustryReportResponseDTO;
+import pickme.report.dto.CompanyIndustryReportSidebarDTO;
 import pickme.report.mapper.ReportMapper;
 import pickme.report.model.Report;
 import pickme.report.repository.ReportRepository;
@@ -21,7 +22,7 @@ public class ReportServiceImpl implements ReportService {
     private ReportMapper reportMapper;
 
     @Override
-    public CompanyIndustryReportResponseDTO createReport(String userId, CompanyIndustryReportCreateDTO reportCreateDTO) {
+    public String createReport(String userId, CompanyIndustryReportCreateDTO reportCreateDTO) {
         Report report = reportRepository.findById(userId).orElseGet(() -> {
             Report newReport = new Report();
             newReport.setUserId(userId);
@@ -33,18 +34,20 @@ public class ReportServiceImpl implements ReportService {
 
         // 새로운 CompanyIndustryReport 생성
         Report.CompanyIndustryReport companyIndustryReport = new Report.CompanyIndustryReport();
+        String reportId = UUID.randomUUID().toString();
+        companyIndustryReport.setReportId(reportId);
         companyIndustryReport.setCategory(category);
         Date now = new Date();
         companyIndustryReport.setCreatedAt(now);
         companyIndustryReport.setUpdatedAt(now);
 
-        // Category에 따라 Details 설정
+        // Category에 따라 Detail 설정
         if (category.equalsIgnoreCase("company") || category.equalsIgnoreCase("all")) {
-            companyIndustryReport.setCompanyDetails(reportMapper.toCompanyDetailList(reportCreateDTO.getCompanyDetails()));
+            companyIndustryReport.setCompanyDetail(reportMapper.toCompanyDetail(reportCreateDTO.getCompanyDetail()));
         }
 
         if (category.equalsIgnoreCase("industry") || category.equalsIgnoreCase("all")) {
-            companyIndustryReport.setIndustryDetails(reportMapper.toIndustryDetailList(reportCreateDTO.getIndustryDetails()));
+            companyIndustryReport.setIndustryDetail(reportMapper.toIndustryDetail(reportCreateDTO.getIndustryDetail()));
         }
 
         // Report에 추가
@@ -53,43 +56,40 @@ public class ReportServiceImpl implements ReportService {
         // 저장
         reportRepository.save(report);
 
-        return reportMapper.toCompanyIndustryReportResponseDTO(companyIndustryReport);
+        return reportId;
     }
 
     @Override
-    public CompanyIndustryReportResponseDTO getReport(String userId, String category, Date createdAt, int page, int size) {
+    public CompanyIndustryReportResponseDTO getReport(String userId, String reportId) {
         Optional<Report> optionalReport = reportRepository.findById(userId);
         if (optionalReport.isPresent()) {
-            Report.CompanyIndustryReport report = findReport(optionalReport.get(), category, createdAt);
-            if (report != null) {
-                CompanyIndustryReportResponseDTO responseDTO = reportMapper.toCompanyIndustryReportResponseDTO(report);
-                // Details에 페이징 적용
-                if (category.equalsIgnoreCase("company") || category.equalsIgnoreCase("all")) {
-                    responseDTO.setCompanyDetails(paginateList(responseDTO.getCompanyDetails(), page, size));
-                }
-                if (category.equalsIgnoreCase("industry") || category.equalsIgnoreCase("all")) {
-                    responseDTO.setIndustryDetails(paginateList(responseDTO.getIndustryDetails(), page, size));
-                }
-                return responseDTO;
+            Report.CompanyIndustryReport foundReport = findReportById(optionalReport.get(), reportId);
+            if (foundReport != null) {
+                return reportMapper.toCompanyIndustryReportResponseDTO(foundReport);
             }
         }
         return null;
     }
 
     @Override
-    public CompanyIndustryReportResponseDTO updateReport(String userId, String category, Date createdAt, CompanyIndustryReportCreateDTO reportUpdateDTO) {
+    public CompanyIndustryReportResponseDTO updateReport(String userId, String reportId, CompanyIndustryReportCreateDTO reportUpdateDTO) {
         Optional<Report> optionalReport = reportRepository.findById(userId);
         if (optionalReport.isPresent()) {
             Report report = optionalReport.get();
-            Report.CompanyIndustryReport companyIndustryReport = findReport(report, category, createdAt);
+            Report.CompanyIndustryReport companyIndustryReport = findReportById(report, reportId);
             if (companyIndustryReport != null) {
+                String category = companyIndustryReport.getCategory();
                 // Category에 따라 Details 업데이트
                 if (category.equalsIgnoreCase("company") || category.equalsIgnoreCase("all")) {
-                    companyIndustryReport.setCompanyDetails(reportMapper.toCompanyDetailList(reportUpdateDTO.getCompanyDetails()));
+                    companyIndustryReport.setCompanyDetail(reportMapper.toCompanyDetail(reportUpdateDTO.getCompanyDetail()));
+                } else {
+                    companyIndustryReport.setCompanyDetail(null);
                 }
 
                 if (category.equalsIgnoreCase("industry") || category.equalsIgnoreCase("all")) {
-                    companyIndustryReport.setIndustryDetails(reportMapper.toIndustryDetailList(reportUpdateDTO.getIndustryDetails()));
+                    companyIndustryReport.setIndustryDetail(reportMapper.toIndustryDetail(reportUpdateDTO.getIndustryDetail()));
+                } else {
+                    companyIndustryReport.setIndustryDetail(null);
                 }
 
                 companyIndustryReport.setUpdatedAt(new Date());
@@ -101,11 +101,11 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public boolean deleteReport(String userId, String category, Date createdAt) {
+    public boolean deleteReport(String userId, String reportId) {
         Optional<Report> optionalReport = reportRepository.findById(userId);
         if (optionalReport.isPresent()) {
             Report report = optionalReport.get();
-            Report.CompanyIndustryReport companyIndustryReport = findReport(report, category, createdAt);
+            Report.CompanyIndustryReport companyIndustryReport = findReportById(report, reportId);
             if (companyIndustryReport != null) {
                 report.getReports().remove(companyIndustryReport);
                 reportRepository.save(report);
@@ -116,37 +116,29 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<CompanyIndustryReportResponseDTO> getReportList(String userId, String category, int page, int size) {
+    public List<CompanyIndustryReportSidebarDTO> getSidebarData(String userId) {
         Optional<Report> optionalReport = reportRepository.findById(userId);
         if (optionalReport.isPresent()) {
-            List<Report.CompanyIndustryReport> reports = optionalReport.get().getReports().stream()
-                    .filter(r -> r.getCategory().equalsIgnoreCase(category))
-                    .collect(Collectors.toList());
-
-            List<Report.CompanyIndustryReport> paginatedReports = paginateList(reports, page, size);
-
-            return paginatedReports.stream()
-                    .map(reportMapper::toCompanyIndustryReportResponseDTO)
+            return optionalReport.get().getReports().stream()
+                    .map(r -> {
+                        CompanyIndustryReportSidebarDTO dto = new CompanyIndustryReportSidebarDTO();
+                        dto.setReportId(r.getReportId());
+                        dto.setCategory(r.getCategory());
+                        dto.setCreatedAt(r.getCreatedAt());
+                        dto.setUpdatedAt(r.getUpdatedAt());
+                        return dto;
+                    })
                     .collect(Collectors.toList());
         }
         return Collections.emptyList();
     }
 
     // 헬퍼 메서드
-    private Report.CompanyIndustryReport findReport(Report report, String category, Date createdAt) {
+    private Report.CompanyIndustryReport findReportById(Report report, String reportId) {
         return report.getReports().stream()
-                .filter(r -> r.getCategory().equalsIgnoreCase(category) && r.getCreatedAt().equals(createdAt))
+                .filter(r -> r.getReportId().equals(reportId))
                 .findFirst()
                 .orElse(null);
-    }
-
-    private <T> List<T> paginateList(List<T> list, int page, int size) {
-        int start = page * size;
-        int end = Math.min(start + size, list.size());
-        if (start >= list.size()) {
-            return Collections.emptyList();
-        }
-        return list.subList(start, end);
     }
 
 }
