@@ -21,4 +21,10 @@ public class CompanyIndustryReportSidebarDTO {
     @Schema(description = "Last update time")
     private Date updatedAt;
 
+    @Schema(description = "회사 이름", example = "Day Company")
+    private String companyName;
+
+    @Schema(description = "산업 타입", example = "E-commerce")
+    private String industryType;
+
 }
