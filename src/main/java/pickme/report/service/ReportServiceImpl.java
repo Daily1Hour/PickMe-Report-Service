@@ -130,14 +130,10 @@ public class ReportServiceImpl implements ReportService {
                         // companyDetail과 industryDetail 중 존재하는 것에 따라 추가 정보 세팅
                         if (r.getCompanyDetail() != null && r.getIndustryDetail() == null) {
                             // companyDetail만 있는 경우
-                            dto.setCompanyName(r.getCompanyDetail().getCompanyName());
+                            dto.setTitle(r.getCompanyDetail().getCompanyName());
                         } else if (r.getIndustryDetail() != null && r.getCompanyDetail() == null) {
                             // industryDetail만 있는 경우
-                            dto.setIndustryType(r.getIndustryDetail().getIndustryType());
-                        }
-                        else if (r.getCompanyDetail() != null && r.getIndustryDetail() != null) {
-                            dto.setCompanyName(r.getCompanyDetail().getCompanyName());
-                            dto.setIndustryType(r.getIndustryDetail().getIndustryType());
+                            dto.setTitle(r.getIndustryDetail().getIndustryFeatures());
                         }
 
                         return dto;
