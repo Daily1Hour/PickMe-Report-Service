@@ -126,12 +126,27 @@ public class ReportServiceImpl implements ReportService {
                         dto.setCategory(r.getCategory());
                         dto.setCreatedAt(r.getCreatedAt());
                         dto.setUpdatedAt(r.getUpdatedAt());
+
+                        // companyDetail과 industryDetail 중 존재하는 것에 따라 추가 정보 세팅
+                        if (r.getCompanyDetail() != null && r.getIndustryDetail() == null) {
+                            // companyDetail만 있는 경우
+                            dto.setCompanyName(r.getCompanyDetail().getCompanyName());
+                        } else if (r.getIndustryDetail() != null && r.getCompanyDetail() == null) {
+                            // industryDetail만 있는 경우
+                            dto.setIndustryType(r.getIndustryDetail().getIndustryType());
+                        }
+                        else if (r.getCompanyDetail() != null && r.getIndustryDetail() != null) {
+                            dto.setCompanyName(r.getCompanyDetail().getCompanyName());
+                            dto.setIndustryType(r.getIndustryDetail().getIndustryType());
+                        }
+
                         return dto;
                     })
                     .collect(Collectors.toList());
         }
         return Collections.emptyList();
     }
+
 
     // 헬퍼 메서드
     private Report.CompanyIndustryReport findReportById(Report report, String reportId) {
