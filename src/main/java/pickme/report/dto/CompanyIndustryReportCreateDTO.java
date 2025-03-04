@@ -5,8 +5,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 @Schema(description = "DTO for creating a new CompanyIndustryReport")
 public class CompanyIndustryReportCreateDTO {
